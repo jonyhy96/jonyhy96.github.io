@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Jony&#39;s blog</title>
+    <link>https://jonyhy96.github.io/tags/</link>
+    <description>Recent content in Tags on Jony&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Wed, 26 Feb 2020 15:37:34 +0800</lastBuildDate>
+    
+	<atom:link href="https://jonyhy96.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>1.14</title>
+      <link>https://jonyhy96.github.io/tags/1.14/</link>
+      <pubDate>Wed, 26 Feb 2020 15:37:34 +0800</pubDate>
+      
+      <guid>https://jonyhy96.github.io/tags/1.14/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>interface</title>
+      <link>https://jonyhy96.github.io/tags/interface/</link>
+      <pubDate>Wed, 26 Feb 2020 15:37:34 +0800</pubDate>
+      
+      <guid>https://jonyhy96.github.io/tags/interface/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>hello-world</title>
+      <link>https://jonyhy96.github.io/tags/hello-world/</link>
+      <pubDate>Sat, 22 Feb 2020 12:19:18 +0800</pubDate>
+      
+      <guid>https://jonyhy96.github.io/tags/hello-world/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

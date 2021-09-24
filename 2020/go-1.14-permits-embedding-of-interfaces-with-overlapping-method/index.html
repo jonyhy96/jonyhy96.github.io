@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  
+  
+  
+  
+  
+  <link rel="prev" href="https://jonyhy96.github.io/2020/hello_world/" />
+  
+  <link rel="canonical" href="https://jonyhy96.github.io/2020/go-1.14-permits-embedding-of-interfaces-with-overlapping-method/" />
+  <link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           Go 1.14 permits embedding of interfaces with overlapping method | Jony&#39;s blog
+       
+  </title>
+  <meta name="title" content="Go 1.14 permits embedding of interfaces with overlapping method | Jony&#39;s blog">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Go 1.14 permits embedding of interfaces with overlapping method"/>
+<meta name="twitter:description" content="在新发布的 Go 1.14 release 1 中我们可一看到go team对代码进行了一系列的优化，其中发生了Change to the language的更新。在本文中作者将对这一更新进行尝试和探讨。
+我们知道Go是不支持继承只支持组合的，在结构体中发生同名字段组合的时候，结构体本身字段的优先级是高于被组合结构体的，可以通过以下代码进行证明。
+package main import &#34;fmt&#34; // Animal animal. type Animal struct { Name string } // Cat cat. type Cat struct { Animal Name string } func main() { var a = Animal{Name: &#34;animal&#34;} var c = Cat{Animal: a, Name: &#34;cat&#34;} fmt.Println(c.Name) } // Output: // cat 而对于接口(interface)，如果在组合的过程中出现函数签名重复的情况则在使用时会发生ambiguous selector，可以通过以下代码证明。
+package main import &#34;fmt&#34; // Animal Animal. type Animal interface { Name() string Age() int } // Dog Dog."/>
+
+  <script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Go 1.14 permits embedding of interfaces with overlapping method",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https:\/\/jonyhy96.github.io\/2020\/go-1.14-permits-embedding-of-interfaces-with-overlapping-method\/"
+  },
+  
+  "genre": "posts",
+  "keywords": "1.14, interface",
+  "wordcount":  154 ,
+  "url": "https:\/\/jonyhy96.github.io\/2020\/go-1.14-permits-embedding-of-interfaces-with-overlapping-method\/",
+  "datePublished": "2020-02-26T15:37:34\x2b08:00",
+  "dateModified": "2020-02-26T15:37:34\x2b08:00",
+  "license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.",
+  
+  
+  "description": ""
+}
+</script>
+</head>
+
+  
+
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="https://jonyhy96.github.io/">Jony&#39;s blog</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">Blog</a>
+                
+                <a class="menu-item" href="/categories/" title="">Categories</a>
+                
+                <a class="menu-item" href="/tags" title="">Tags</a>
+                
+                <a class="menu-item" href="/about" title="">About</a>
+                
+                <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-sun"></i></a>&nbsp;
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-sun"></i></a>&nbsp;<a href="https://jonyhy96.github.io/">Jony&#39;s blog</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">Blog</a>
+                
+                <a class="menu-item" href="/categories/" title="">Categories</a>
+                
+                <a class="menu-item" href="/tags" title="">Tags</a>
+                
+                <a class="menu-item" href="/about" title="">About</a>
+                
+        </div>
+    </div>
+</nav>
+
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp">
+    <header class="post-header">
+        <h1 class="post-title">Go 1.14 permits embedding of interfaces with overlapping method</h1>
+        <div class="post-meta">
+            Written by <a href="https://jonyhy96.github.io/" rel="author">Jony montana</a> with ♥ 
+                <span class="post-time">
+                    on <time datetime=2020-02-26 >26 February 2020</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="https://jonyhy96.github.io/categories/go/"> go </a>
+                        
+                </span>
+                <i class="iconfont icon-timer"></i>
+                1 min
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          <p>在新发布的 Go 1.14 release <sup><a href="#reference-1">1</a></sup> 中我们可一看到go team对代码进行了一系列的优化，其中发生了<code>Change to the language</code>的更新。在本文中作者将对这一更新进行尝试和探讨。</p>
+<p>我们知道Go是不支持继承只支持组合的，在结构体中发生同名字段组合的时候，结构体本身字段的优先级是高于被组合结构体的，可以通过以下代码进行证明。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;fmt&#34;</span>
+
+<span style="color:#75715e">// Animal animal.
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Animal</span> <span style="color:#66d9ef">struct</span> {
+	<span style="color:#a6e22e">Name</span> <span style="color:#66d9ef">string</span>
+}
+
+<span style="color:#75715e">// Cat cat.
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Cat</span> <span style="color:#66d9ef">struct</span> {
+	<span style="color:#a6e22e">Animal</span>
+	<span style="color:#a6e22e">Name</span> <span style="color:#66d9ef">string</span>
+}
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a</span> = <span style="color:#a6e22e">Animal</span>{<span style="color:#a6e22e">Name</span>: <span style="color:#e6db74">&#34;animal&#34;</span>}
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">c</span> = <span style="color:#a6e22e">Cat</span>{<span style="color:#a6e22e">Animal</span>: <span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">Name</span>: <span style="color:#e6db74">&#34;cat&#34;</span>}
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">Name</span>)
+}
+<span style="color:#75715e">// Output:
+</span><span style="color:#75715e">// cat
+</span></code></pre></div><p>而对于接口(interface)，如果在组合的过程中出现函数签名重复的情况则在使用时会发生<code>ambiguous selector</code>，可以通过以下代码证明。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;fmt&#34;</span>
+
+<span style="color:#75715e">// Animal Animal.
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Animal</span> <span style="color:#66d9ef">interface</span> {
+	<span style="color:#a6e22e">Name</span>() <span style="color:#66d9ef">string</span>
+	<span style="color:#a6e22e">Age</span>() <span style="color:#66d9ef">int</span>
+}
+
+<span style="color:#75715e">// Dog Dog.
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Dog</span> <span style="color:#66d9ef">interface</span> {
+	<span style="color:#a6e22e">Name</span>() <span style="color:#66d9ef">string</span> <span style="color:#75715e">// custom Name func
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">Animal</span>
+}
+
+<span style="color:#75715e">// Pug pug.
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Pug</span> <span style="color:#66d9ef">struct</span> {
+}
+
+<span style="color:#75715e">// Name Name.
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">pug</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Pug</span>) <span style="color:#a6e22e">Name</span>() <span style="color:#66d9ef">string</span> { <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;pug&#34;</span> }
+
+<span style="color:#75715e">// Age Age.
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">pug</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Pug</span>) <span style="color:#a6e22e">Age</span>() <span style="color:#66d9ef">int</span> { <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span> }
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dog</span> <span style="color:#a6e22e">Dog</span>
+	<span style="color:#a6e22e">dog</span> = <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">Pug</span>{}
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">dog</span>.<span style="color:#a6e22e">Name</span>()) <span style="color:#75715e">// go1.13 will cause ambiguous selector
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">dog</span>.<span style="color:#a6e22e">Age</span>())
+}
+</code></pre></div><p>此次更新前，我们只能通过删除被组合类型(Animal)或组合类型(Dog)的方法来解决这个问题，这在实际开发过程中是非常不友好的，也会使得代码变得难以维护。</p>
+<p>这次的更新使得我们在组合类型中定义方法会覆盖被组合类型的方法，以上代码在go1.14下可以正常编译运行。</p>
+<h3 id="reference">Reference:</h3>
+<p><a id="reference-1"></a>1. <a href="https://golang.org/doc/go1.14#language">https://golang.org/doc/go1.14#language</a> &ldquo;Go 1.14 release document&rdquo;</p>
+<p><a id="reference-2"></a>2. <a href="https://github.com/golang/proposal/blob/master/design/6977-overlapping-interfaces.md">https://github.com/golang/proposal/blob/master/design/6977-overlapping-interfaces.md</a> &ldquo;overlapping interfaces proposal&rdquo;</p>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>Jony montana </span>
+                </p>
+            
+           
+            <p class="copyright-item">
+                    <span>Words:</span>
+                   <span>154</span>
+            </p>
+            
+            <p class="copyright-item">
+                
+                <span>Share:</span>
+                <span>
+
+      
+        <a href="//twitter.com/share?url=https%3a%2f%2fjonyhy96.github.io%2f2020%2fgo-1.14-permits-embedding-of-interfaces-with-overlapping-method%2f&amp;text=Go%201.14%20permits%20embedding%20of%20interfaces%20with%20overlapping%20method&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="iconfont icon-twitter"></i>
+        </a>
+        
+      
+      
+        <a href="//www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fjonyhy96.github.io%2f2020%2fgo-1.14-permits-embedding-of-interfaces-with-overlapping-method%2f" target="_blank" title="Share on Facebook">
+          <i class="iconfont icon-facebook"></i>
+        </a>
+        
+      
+      
+        <a href="//reddit.com/submit?url=https%3a%2f%2fjonyhy96.github.io%2f2020%2fgo-1.14-permits-embedding-of-interfaces-with-overlapping-method%2f&amp;title=Go%201.14%20permits%20embedding%20of%20interfaces%20with%20overlapping%20method" target="_blank" title="Share on Reddit">
+          <i class="iconfont icon-reddit"></i>
+        </a>
+        
+      
+      
+      
+      
+        
+      
+        <a href="//news.ycombinator.com/submitlink?u=https%3a%2f%2fjonyhy96.github.io%2f2020%2fgo-1.14-permits-embedding-of-interfaces-with-overlapping-method%2f&amp;description=Go%201.14%20permits%20embedding%20of%20interfaces%20with%20overlapping%20method" target="_blank" title="Share on Hacker News">
+          <i class="iconfont icon-ycombinator"></i>
+        </a>
+        
+        
+      
+
+          
+
+          
+
+          
+
+          
+</span>
+                
+            </p>
+
+             
+            <p class="copyright-item">
+                Released under <a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a>
+            </p>
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-icon-tag"></i>Tag: 
+            
+            <span class="tag"><a href="https://jonyhy96.github.io/tags/1.14/">
+                    #1.14</a></span>
+            
+            <span class="tag"><a href="https://jonyhy96.github.io/tags/interface/">
+                    #interface</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">Back</a></span> · 
+                <span><a href="https://jonyhy96.github.io/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="https://jonyhy96.github.io/2020/hello_world/" class="prev" rel="prev" title="Hello_world"><i class="iconfont icon-dajiantou"></i>&nbsp;Hello_world</a>
+         
+        
+    </div>
+
+    <div class="post-comment">
+          
+          <div id="gitalk-container"></div>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+      <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+      <script type="text/javascript">
+          var gitalk = new Gitalk({
+              id: '2020-02-26 15:37:34 \x2b0800 \x2b0800',
+              title: 'Go 1.14 permits embedding of interfaces with overlapping method',
+              clientID: '0588d67cc5677fc1c83f',
+              clientSecret: '3e427737921a07b7396dacf47993db9ad660494a',
+              repo: 'jonyhy96.github.io',
+              owner: 'jonyhy96',
+              admin: ['jonyhy96'],
+              body: decodeURI(location.href)
+          });
+          gitalk.render('gitalk-container');
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+ 
+
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2020 - 2021</span>
+        
+         
+            <span class="author" itemprop="copyrightHolder"><a href="https://jonyhy96.github.io/">Jony montana</a> | </span>
+         
+
+		  <span>Crafted with ❤️ by <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="external nofollow noopener noreffer">KeepIt</a> & <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreffer">Hugo</a></span>
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    <script src="/js/vendor_no_gallery.min.js" async=""></script>
+    
+  
+
+
+
+
+
+
+
+     </div>
+  </body>
+</html>
